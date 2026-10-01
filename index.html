@@ -310,15 +310,16 @@ async function handleGoogleCredential(response){
     signedInUser=data.user;
     sessionStorage.setItem('stockLensUser',JSON.stringify(signedInUser));
     sessionStorage.setItem('stockLensCredential',response.credential);
-    showSignedIn();
+    await showSignedIn();
   }catch(e){
     $('loginMessage').textContent='登入驗證失敗，請再試一次';
   }
 }
-function showSignedIn(){
+async function showSignedIn(){
   if(!signedInUser)return;
   $('loginGate').style.display='none';
   $('userLine').textContent=(signedInUser.display_name||signedInUser.email)+' · 台股研究工作台';
+  await loadUserWatchlist();
 }
 function logout(){
   sessionStorage.removeItem('stockLensUser');
@@ -360,17 +361,88 @@ const presets={
  '8046':{industry:'IC 載板 · PCB'},
  '2412':{industry:'電信 · 高股息'}
 };
-let groups=JSON.parse(localStorage.getItem('stockLensGroups')||'null')||[
- {name:'AI 供應鏈',symbols:['2383','3037','8046']},
- {name:'高股息',symbols:['2412']},
- {name:'觀察中',symbols:[]}
+let groups=[
+ {group_id:'g_ai',name:'AI 供應鏈',symbols:['2383','3037','8046']},
+ {group_id:'g_dividend',name:'高股息',symbols:['2412']},
+ {group_id:'g_watch',name:'觀察中',symbols:[]}
 ];
-let stars=new Set(JSON.parse(localStorage.getItem('stockLensStars')||'["2383"]'));
-let active=0,quotes={},currentSymbol=null,hist=[];
-function save(){localStorage.setItem('stockLensGroups',JSON.stringify(groups));localStorage.setItem('stockLensStars',JSON.stringify([...stars]))}
+let stars=new Set(['2383']);
+let active=0,quotes={},currentSymbol=null,hist=[],watchlistReady=false;
+
+function currentCredential(){return sessionStorage.getItem('stockLensCredential')||''}
+
+async function userApi(action, extra={}){
+  const credential=currentCredential();
+  if(!credential) throw new Error('missing_credential');
+  const r=await fetch('/.netlify/functions/auth',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({credential,action,...extra})
+  });
+  const data=await r.json();
+  if(!r.ok||!data.ok) throw new Error(data.error||'api_failed');
+  return data;
+}
+
+function normalizeGroups(serverGroups){
+  return (serverGroups||[]).map((g,gi)=>({
+    group_id:g.group_id||('g_'+gi),
+    name:g.name||('自選'+(gi+1)),
+    symbols:(g.stocks||[]).map(s=>String(s.symbol))
+  }));
+}
+
+function rebuildStars(serverGroups){
+  stars=new Set();
+  (serverGroups||[]).forEach(g=>(g.stocks||[]).forEach(s=>{if(s.starred)stars.add(String(s.symbol))}));
+}
+
+async function loadUserWatchlist(){
+  $('statusText').textContent='載入個人自選…';
+  try{
+    const data=await userApi('getWatchlist');
+    if(data.groups&&data.groups.length){
+      groups=normalizeGroups(data.groups);
+      rebuildStars(data.groups);
+    }else{
+      await save();
+    }
+    active=Math.min(active,Math.max(0,groups.length-1));
+    watchlistReady=true;
+    renderTabs();
+    await loadQuotes();
+    $('statusText').textContent='個人資料已同步';
+  }catch(e){
+    watchlistReady=false;
+    $('statusText').textContent='個人資料同步失敗';
+    renderTabs();
+    await loadQuotes();
+  }
+}
+
+async function save(){
+  if(!signedInUser)return;
+  const payload=groups.map((g,gi)=>({
+    group_id:g.group_id||('g_'+gi),
+    name:g.name,
+    stocks:(g.symbols||[]).map((symbol,si)=>({
+      symbol:String(symbol),
+      starred:stars.has(String(symbol)),
+      sort_order:si+1
+    }))
+  }));
+  $('statusText').textContent='正在同步自選…';
+  try{
+    await userApi('saveWatchlist',{groups:payload});
+    $('statusText').textContent='個人資料已同步';
+    $('updatedAt').textContent='同步 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    $('statusText').textContent='自選同步失敗';
+  }
+}
 function parseQ(q){const current=num(q.z)||num((q.a||'').split('_')[0])||num(q.y),prev=num(q.y),change=current-prev;return{symbol:q.c,name:q.n||q.c,current,prev,change,pct:prev?change/prev*100:NaN,open:num(q.o),high:num(q.h),low:num(q.l),vol:num(q.v),bid:num((q.b||'').split('_')[0]),ask:num((q.a||'').split('_')[0]),time:q.t||''}}
 function renderTabs(){$('tabs').innerHTML=groups.map((g,i)=>'<button class="tab '+(i===active?'active':'')+'" onclick="active='+i+';loadQuotes()">'+g.name+'</button>').join('')}
-function toggleStar(s){stars.has(s)?stars.delete(s):stars.add(s);save();renderCards()}
+async function toggleStar(s){stars.has(s)?stars.delete(s):stars.add(s);renderCards();await save()}
 function renderCards(){
  const g=groups[active]; let arr=g.symbols.map(s=>quotes[s]).filter(Boolean);
  const mode=$('sortSelect').value;
@@ -388,8 +460,8 @@ async function loadQuotes(){
  try{const j=await api('type=quotes&symbols='+syms.join(','));(j.msgArray||[]).forEach(x=>{const q=parseQ(x);quotes[q.symbol]=q});$('statusText').textContent='真實資料已更新';$('updatedAt').textContent='更新 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});renderCards()}catch(e){$('watchlist').innerHTML='<div class="empty">行情暫時無法取得，請稍後重新整理。</div>'}
 }
 async function loadMarket(){try{const j=await api('type=index'),q=parseQ(j.msgArray[0]);$('taiexPrice').textContent=fmt(q.current,2);$('taiexChange').className='change '+(q.change>=0?'up':'down');$('taiexChange').textContent=(q.change>=0?'+':'')+fmt(q.change,2)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)';$('marketTime').textContent=q.time||'--'}catch(e){}}
-async function addStock(){const s=(prompt('輸入上市股票代號，例如 2383')||'').trim();if(!/^\d{4}$/.test(s))return;if(groups[active].symbols.includes(s))return alert('這檔已在目前分頁');try{const j=await api('type=quote&symbol='+s);if(!j.msgArray||!j.msgArray.length)return alert('找不到股票');const q=parseQ(j.msgArray[0]);quotes[s]=q;groups[active].symbols.push(s);save();renderCards()}catch(e){alert('目前無法驗證這個股票代號')}}
-function renameGroup(){const n=(prompt('重新命名目前分頁',groups[active].name)||'').trim();if(n){groups[active].name=n.slice(0,12);save();renderTabs()}}
+async function addStock(){const s=(prompt('輸入上市股票代號，例如 2383')||'').trim();if(!/^\d{4}$/.test(s))return;if(groups[active].symbols.includes(s))return alert('這檔已在目前分頁');try{const j=await api('type=quote&symbol='+s);if(!j.msgArray||!j.msgArray.length)return alert('找不到股票');const q=parseQ(j.msgArray[0]);quotes[s]=q;groups[active].symbols.push(s);renderCards();await save()}catch(e){alert('目前無法驗證這個股票代號')}}
+async function renameGroup(){const n=(prompt('重新命名目前分頁',groups[active].name)||'').trim();if(n){groups[active].name=n.slice(0,12);renderTabs();await save()}}
 function rocDate(s){const p=String(s).split('/');return p.length===3?new Date(+p[0]+1911,+p[1]-1,+p[2]).getTime():0}
 function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN}
 function ma(n){const a=hist.slice(-n).map(x=>x.close);return a.length===n?avg(a):NaN}
@@ -406,7 +478,7 @@ function renderDetailTech(q){
  const m5=ma(5),m10=ma(10),m20=ma(20);let trend='整理';if(q.current>m5&&m5>m10&&m10>m20)trend='偏多';else if(q.current<m5&&m5<m10&&m10<m20)trend='偏弱';const av=avg(hist.slice(-20).map(x=>x.vol)),vr=av?q.vol/av:NaN,vs=vr>=1.5?'明顯放量':vr>=1.15?'量增':vr<=.75?'量縮':'量能一般';$('analysisText').textContent='現價 '+fmt(q.current,0)+'，MA5 '+fmt(m5,0)+'、MA10 '+fmt(m10,0)+'、MA20 '+fmt(m20,0)+'。目前均線結構為「'+trend+'」，今日成交量相對近 20 日均量屬於「'+vs+'」。支撐與壓力為近期價格區域的動態估算，需搭配後續量價與籌碼確認。';
 }
 function closeDetail(){$('detail').classList.remove('show');$('home').classList.remove('hidden')}
-renderTabs();loadMarket();loadQuotes();setInterval(()=>{loadMarket();loadQuotes()},60000);
+renderTabs();loadMarket();setInterval(()=>{loadMarket();if(signedInUser)loadQuotes()},60000);
 </script>
 </body>
 </html>
