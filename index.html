@@ -380,6 +380,14 @@ async function userApi(action, extra={}){
     body:JSON.stringify({credential,action,...extra})
   });
   const data=await r.json();
+  if(r.status===401){
+    sessionStorage.removeItem('stockLensUser');
+    sessionStorage.removeItem('stockLensCredential');
+    signedInUser=null;
+    $('loginGate').style.display='flex';
+    $('loginMessage').textContent='登入已逾時，請重新使用 Google 登入';
+    throw new Error('session_expired');
+  }
   if(!r.ok||!data.ok) throw new Error(data.error||'api_failed');
   return data;
 }
@@ -414,7 +422,7 @@ async function loadUserWatchlist(){
     $('statusText').textContent='個人資料已同步';
   }catch(e){
     watchlistReady=false;
-    $('statusText').textContent='個人資料同步失敗';
+    if(e.message!=='session_expired') $('statusText').textContent='個人資料同步失敗 · '+e.message;
     renderTabs();
     await loadQuotes();
   }
@@ -437,7 +445,7 @@ async function save(){
     $('statusText').textContent='個人資料已同步';
     $('updatedAt').textContent='同步 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
-    $('statusText').textContent='自選同步失敗';
+    if(e.message!=='session_expired') $('statusText').textContent='自選同步失敗 · '+e.message;
   }
 }
 function parseQ(q){const current=num(q.z)||num((q.a||'').split('_')[0])||num(q.y),prev=num(q.y),change=current-prev;return{symbol:q.c,name:q.n||q.c,current,prev,change,pct:prev?change/prev*100:NaN,open:num(q.o),high:num(q.h),low:num(q.l),vol:num(q.v),bid:num((q.b||'').split('_')[0]),ask:num((q.a||'').split('_')[0]),time:q.t||''}}
