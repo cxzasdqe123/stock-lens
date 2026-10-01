@@ -12,18 +12,19 @@ export default async (request, context) => {
   });
 
   try {
-    if (type === "quote") {
-      const exCh = "tse_" + symbol + ".tw";
+    if (type === "quote" || type === "quotes") {
+      const symbols = (url.searchParams.get("symbols") || symbol)
+        .split(",").map(s => s.trim()).filter(Boolean).slice(0, 20);
+      const exCh = symbols.map(s => "tse_" + s + ".tw").join("|");
       const target = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=" + encodeURIComponent(exCh) + "&_=" + Date.now();
       const res = await fetch(target, {
         headers: {
           "user-agent": "Mozilla/5.0",
-          "referer": "https://mis.twse.com.tw/stock/fibest.jsp?stock=" + symbol
+          "referer": "https://mis.twse.com.tw/"
         }
       });
       if (!res.ok) throw new Error("TWSE MIS " + res.status);
-      const data = await res.json();
-      return json(data);
+      return json(await res.json());
     }
 
     if (type === "index") {
