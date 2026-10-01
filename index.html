@@ -260,6 +260,12 @@ nav button.active::before{
   border-color:#dfe5ec;
   box-shadow:0 16px 38px rgba(42,54,70,.065)
 }
+.stockSearchOverlay{position:fixed;inset:0;z-index:120;background:rgba(24,32,42,.28);backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;padding:18px}
+.stockSearchOverlay.show{display:flex}.stockSearchPanel{width:min(100%,520px);max-height:78vh;background:#fbfcfe;border:1px solid #e4e9ef;border-radius:28px;padding:18px;box-shadow:0 26px 70px rgba(27,39,55,.18);overflow:hidden}
+.stockSearchHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.stockSearchHead h3{margin:0;font-size:18px}.stockSearchClose{border:0;background:#eef2f5;width:36px;height:36px;border-radius:12px;font-size:18px}
+.stockSearchInput{width:100%;border:1px solid #dfe5ec;background:white;border-radius:16px;padding:14px 15px;font-size:15px;outline:none}.stockSearchInput:focus{border-color:#b8c8ef;box-shadow:0 0 0 4px rgba(157,183,255,.12)}
+.stockSearchHint{font-size:10px;color:var(--muted);margin:8px 3px 10px}.stockResults{display:grid;gap:8px;overflow:auto;max-height:52vh;padding-bottom:4px}.stockResult{border:1px solid #e8edf2;background:white;border-radius:16px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}.stockResult strong{font-size:14px}.stockResult small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.stockMarket{font-size:9px;border-radius:999px;padding:5px 8px;background:#f1f4f7;color:#64707e;font-weight:700;white-space:nowrap}
+@media(min-width:700px){.stockSearchOverlay{align-items:center}}
 </style>
 </head>
 <body>
@@ -270,6 +276,14 @@ nav button.active::before{
     <div style="font-size:12px;color:#788391;margin-top:6px;line-height:1.6">登入後載入你的自選股、交易紀錄與個人設定</div>
     <div id="googleButton" style="display:flex;justify-content:center;margin-top:24px"></div>
     <div id="loginMessage" style="font-size:10px;color:#8a95a3;margin-top:14px">使用 Google 帳號登入</div>
+  </div>
+</div>
+<div id="stockSearchOverlay" class="stockSearchOverlay" onclick="if(event.target===this)closeStockSearch()">
+  <div class="stockSearchPanel">
+    <div class="stockSearchHead"><h3>加入自選股票</h3><button class="stockSearchClose" onclick="closeStockSearch()">×</button></div>
+    <input id="stockSearchInput" class="stockSearchInput" placeholder="輸入股票代號或名稱，例如 2383、台光電" autocomplete="off" oninput="renderStockSearch()">
+    <div class="stockSearchHint">支援上市、上櫃股票 · 可用代號、公司簡稱或完整公司名稱搜尋</div>
+    <div id="stockResults" class="stockResults"></div>
   </div>
 </div>
 <div class="home" id="home">
@@ -296,6 +310,20 @@ nav button.active::before{
 const $=id=>document.getElementById(id);
 const GOOGLE_CLIENT_ID='848367507389-ohu8r1uc525oq6l3b58ta5e5i2geboie.apps.googleusercontent.com';
 let signedInUser=null;
+let stockMaster=[];
+let stockMeta={};
+
+async function loadStockMaster(){
+  if(stockMaster.length)return;
+  try{
+    const r=await fetch('/data/stock-master.json',{cache:'no-store'});
+    const data=await r.json();
+    stockMaster=Array.isArray(data.items)?data.items:[];
+    stockMeta=Object.fromEntries(stockMaster.map(x=>[String(x.symbol),x]));
+  }catch(e){
+    stockMaster=[];stockMeta={};
+  }
+}
 
 async function handleGoogleCredential(response){
   $('loginMessage').textContent='正在驗證 Google 帳號…';
@@ -319,6 +347,7 @@ async function showSignedIn(){
   if(!signedInUser)return;
   $('loginGate').style.display='none';
   $('userLine').textContent=(signedInUser.display_name||signedInUser.email)+' · 台股研究工作台';
+  await loadStockMaster();
   await loadUserWatchlist();
 }
 function logout(){
@@ -452,20 +481,27 @@ function parseQ(q){const current=num(q.z)||num((q.a||'').split('_')[0])||num(q.y
 function renderTabs(){$('tabs').innerHTML=groups.map((g,i)=>'<button class="tab '+(i===active?'active':'')+'" onclick="active='+i+';loadQuotes()">'+g.name+'</button>').join('')}
 async function toggleStar(s){stars.has(s)?stars.delete(s):stars.add(s);renderCards();await save()}
 function renderCards(){
- const g=groups[active]; let arr=g.symbols.map(s=>quotes[s]).filter(Boolean);
+ const g=groups[active]; let arr=g.symbols.map(s=>quotes[s]).filter(q=>q&&Number.isFinite(q.current)&&Number.isFinite(q.prev));
  const mode=$('sortSelect').value;
  arr.sort((a,b)=>{if(stars.has(a.symbol)!==stars.has(b.symbol))return stars.has(a.symbol)?-1:1;if(mode==='change')return b.pct-a.pct;if(mode==='name')return a.name.localeCompare(b.name,'zh-Hant');return g.symbols.indexOf(a.symbol)-g.symbols.indexOf(b.symbol)});
  $('watchlist').innerHTML=arr.length?arr.map(q=>{
    const trend=q.current>q.prev?'trendUp':q.current<q.prev?'trendDown':'neutral';
    const trendTxt=q.current>q.prev?'今日偏強':q.current<q.prev?'今日偏弱':'平盤';
-   return '<div class="card"><div class="row"><div style="display:flex;gap:9px;align-items:flex-start"><button class="star '+(stars.has(q.symbol)?'on':'')+'" onclick="event.stopPropagation();toggleStar(\''+q.symbol+'\')">'+(stars.has(q.symbol)?'★':'☆')+'</button><div><span class="name">'+q.name+'</span><span class="ticker">'+q.symbol+'</span></div></div><div class="price"><b>'+fmt(q.current,q.current<1000?1:0)+'</b><div class="change '+(q.change>=0?'up':'down')+'">'+(q.change>=0?'+':'')+fmt(q.change,q.current<1000?1:0)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)</div></div></div><div class="tags"><span class="tag">'+(presets[q.symbol]?.industry||'待分類')+'</span><span class="tag '+trend+'">'+trendTxt+'</span></div><div class="quick"><div><span>成交量</span><b>'+fmt(q.vol)+' 張</b></div><div><span>今日高</span><b>'+fmt(q.high,q.high<1000?1:0)+'</b></div><div><span>今日低</span><b>'+fmt(q.low,q.low<1000?1:0)+'</b></div></div><button class="detailBtn" onclick="openDetail(\''+q.symbol+'\')">查看完整分析 →</button></div>'
+   return '<div class="card"><div class="row"><div style="display:flex;gap:9px;align-items:flex-start"><button class="star '+(stars.has(q.symbol)?'on':'')+'" onclick="event.stopPropagation();toggleStar(\''+q.symbol+'\')">'+(stars.has(q.symbol)?'★':'☆')+'</button><div><span class="name">'+q.name+'</span><span class="ticker">'+q.symbol+'</span></div></div><div class="price"><b>'+fmt(q.current,q.current<1000?1:0)+'</b><div class="change '+(q.change>=0?'up':'down')+'">'+(q.change>=0?'+':'')+fmt(q.change,q.current<1000?1:0)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)</div></div></div><div class="tags"><span class="tag">'+(stockMeta[q.symbol]?.industry||presets[q.symbol]?.industry||'待分類')+'</span><span class="tag '+trend+'">'+trendTxt+'</span></div><div class="quick"><div><span>成交量</span><b>'+fmt(q.vol)+' 張</b></div><div><span>今日高</span><b>'+fmt(q.high,q.high<1000?1:0)+'</b></div><div><span>今日低</span><b>'+fmt(q.low,q.low<1000?1:0)+'</b></div></div><button class="detailBtn" onclick="openDetail(\''+q.symbol+'\')">查看完整分析 →</button></div>'
  }).join(''):'<div class="empty">這個分頁還沒有股票，按右上角 ＋ 加入。</div>';
 }
 async function loadQuotes(){
  renderTabs();$('watchlist').innerHTML='<div class="empty">更新真實行情中…</div>';
  const syms=groups[active].symbols;
  if(!syms.length){renderCards();return}
- try{const j=await api('type=quotes&symbols='+syms.join(','));(j.msgArray||[]).forEach(x=>{const q=parseQ(x);quotes[q.symbol]=q});$('statusText').textContent='真實資料已更新';$('updatedAt').textContent='更新 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});renderCards()}catch(e){$('watchlist').innerHTML='<div class="empty">行情暫時無法取得，請稍後重新整理。</div>'}
+ try{
+   const markets=syms.map(s=>stockMeta[s]?.market||'TWSE');
+   const j=await api('type=quotes&symbols='+syms.join(',')+'&markets='+markets.join(','));
+   (j.msgArray||[]).forEach(x=>{const q=parseQ(x);if(q.symbol)quotes[q.symbol]=q});
+   $('statusText').textContent='真實資料已更新';
+   $('updatedAt').textContent='更新 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+   renderCards()
+ }catch(e){$('watchlist').innerHTML='<div class="empty">行情暫時無法取得，請稍後重新整理。</div>'}
 }
 async function loadMarket(){try{const j=await api('type=index'),q=parseQ(j.msgArray[0]);$('taiexPrice').textContent=fmt(q.current,2);$('taiexChange').className='change '+(q.change>=0?'up':'down');$('taiexChange').textContent=(q.change>=0?'+':'')+fmt(q.change,2)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)';$('marketTime').textContent=q.time||'--'}catch(e){}}
 async function addStock(){const s=(prompt('輸入上市股票代號，例如 2383')||'').trim();if(!/^\d{4}$/.test(s))return;if(groups[active].symbols.includes(s))return alert('這檔已在目前分頁');try{const j=await api('type=quote&symbol='+s);if(!j.msgArray||!j.msgArray.length)return alert('找不到股票');const q=parseQ(j.msgArray[0]);quotes[s]=q;groups[active].symbols.push(s);renderCards();await save()}catch(e){alert('目前無法驗證這個股票代號')}}
@@ -475,7 +511,7 @@ function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN}
 function ma(n){const a=hist.slice(-n).map(x=>x.close);return a.length===n?avg(a):NaN}
 async function openDetail(symbol){
  currentSymbol=symbol;const q=quotes[symbol];if(!q)return;
- $('home').classList.add('hidden');$('detail').classList.add('show');$('dName').textContent=q.name+' '+q.symbol;$('dIndustry').textContent=presets[symbol]?.industry||'待分類';$('dPrice').textContent=fmt(q.current,q.current<1000?1:0);$('dChange').className='change '+(q.change>=0?'up':'down');$('dChange').textContent=(q.change>=0?'+':'')+fmt(q.change,q.current<1000?1:0)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)';$('dTime').textContent='報價 '+(q.time||'--');$('dOpen').textContent=fmt(q.open,q.open<1000?1:0);$('dHigh').textContent=fmt(q.high,q.high<1000?1:0);$('dLow').textContent=fmt(q.low,q.low<1000?1:0);$('dPrev').textContent=fmt(q.prev,q.prev<1000?1:0);$('dVol').textContent=fmt(q.vol)+' 張';$('dAmp').textContent=(q.prev?((q.high-q.low)/q.prev*100).toFixed(2):'--')+'%';$('historyLabel').textContent='載入中';$('chart').innerHTML='';
+ $('home').classList.add('hidden');$('detail').classList.add('show');$('dName').textContent=q.name+' '+q.symbol;$('dIndustry').textContent=stockMeta[symbol]?.industry||presets[symbol]?.industry||'待分類';$('dPrice').textContent=fmt(q.current,q.current<1000?1:0);$('dChange').className='change '+(q.change>=0?'up':'down');$('dChange').textContent=(q.change>=0?'+':'')+fmt(q.change,q.current<1000?1:0)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)';$('dTime').textContent='報價 '+(q.time||'--');$('dOpen').textContent=fmt(q.open,q.open<1000?1:0);$('dHigh').textContent=fmt(q.high,q.high<1000?1:0);$('dLow').textContent=fmt(q.low,q.low<1000?1:0);$('dPrev').textContent=fmt(q.prev,q.prev<1000?1:0);$('dVol').textContent=fmt(q.vol)+' 張';$('dAmp').textContent=(q.prev?((q.high-q.low)/q.prev*100).toFixed(2):'--')+'%';$('historyLabel').textContent='載入中';$('chart').innerHTML='';
  try{const j=await api('type=history&symbol='+symbol+'&months=3');hist=(j.data||[]).map(r=>({date:r[0],vol:num(r[1])/1000,open:num(r[3]),high:num(r[4]),low:num(r[5]),close:num(r[6])})).filter(r=>Number.isFinite(r.close)).sort((a,b)=>rocDate(a.date)-rocDate(b.date));renderDetailTech(q)}catch(e){$('historyLabel').textContent='歷史資料取得失敗'}
 }
 function renderDetailTech(q){
