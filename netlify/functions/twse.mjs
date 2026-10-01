@@ -15,7 +15,13 @@ export default async (request, context) => {
     if (type === "quote" || type === "quotes") {
       const symbols = (url.searchParams.get("symbols") || symbol)
         .split(",").map(s => s.trim()).filter(Boolean).slice(0, 20);
-      const exCh = symbols.map(s => "tse_" + s + ".tw").join("|");
+      const marketList = (url.searchParams.get("markets") || url.searchParams.get("market") || "")
+        .split(",").map(s => s.trim());
+      const exCh = symbols.map((s,i) => {
+        const m = (marketList[i] || marketList[0] || "TWSE").toLowerCase();
+        const prefix = (m === "tpex" || m === "otc") ? "otc_" : "tse_";
+        return prefix + s + ".tw";
+      }).join("|");
       const target = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=" + encodeURIComponent(exCh) + "&_=" + Date.now();
       const res = await fetch(target, {
         headers: {
