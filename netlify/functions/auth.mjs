@@ -25,15 +25,36 @@ export default async (request) => {
     if (info.aud !== CLIENT_ID) return json({error:"invalid_audience"},401);
     if (String(info.email_verified) !== "true") return json({error:"email_not_verified"},401);
 
-    return json({
-      ok:true,
-      user:{
-        user_id:info.sub,
-        email:info.email,
-        display_name:info.name || "",
-        photo_url:info.picture || ""
+    const user = {
+      user_id:info.sub,
+      email:info.email,
+      display_name:info.name || "",
+      photo_url:info.picture || ""
+    };
+
+    let db_sync = "not_configured";
+    const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
+    const internalSecret = process.env.APP_INTERNAL_SECRET;
+
+    if (scriptUrl && internalSecret) {
+      try {
+        const dbRes = await fetch(scriptUrl, {
+          method:"POST",
+          headers:{"content-type":"application/json"},
+          body:JSON.stringify({
+            secret:internalSecret,
+            action:"upsertUser",
+            user
+          })
+        });
+        const dbJson = await dbRes.json().catch(()=>({}));
+        db_sync = dbRes.ok && dbJson.ok ? "ok" : "failed";
+      } catch (e) {
+        db_sync = "failed";
       }
-    });
+    }
+
+    return json({ ok:true, user, db_sync });
   } catch (err) {
     return json({error:String(err?.message || err)},500);
   }
