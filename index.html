@@ -95,6 +95,170 @@ nav button.active::before{content:"";display:block;width:22px;height:3px;border-
 @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .market,.status,.card,.panel{animation:riseIn .38s ease both}
 .list .card:nth-child(2){animation-delay:.04s}.list .card:nth-child(3){animation-delay:.08s}.list .card:nth-child(4){animation-delay:.12s}
+
+/* ===== Japanese tech theme override ===== */
+:root{
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --text:#18202a;
+  --muted:#7c8795;
+  --line:#e9edf2;
+  --dark:#202a36;
+  --up:#e35f68;
+  --down:#3e9b7f;
+  --amber:#bd8b42;
+  --shadow:0 10px 28px rgba(37,49,65,.055)
+}
+body{
+  background:
+    radial-gradient(circle at 14% 0%, rgba(204,220,255,.35), transparent 30%),
+    radial-gradient(circle at 96% 10%, rgba(214,242,235,.38), transparent 28%),
+    linear-gradient(180deg,#fbfcfe 0%,#f5f7fa 100%);
+}
+header{
+  background:rgba(250,251,253,.84);
+  border-bottom:1px solid rgba(220,226,234,.72);
+}
+.brand{
+  color:#17202b;
+  letter-spacing:-.9px;
+}
+.brand::after{
+  width:6px;height:6px;
+  background:linear-gradient(135deg,#9db7ff,#9edbc9);
+  box-shadow:0 0 0 5px rgba(158,183,255,.10)
+}
+.status{
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(222,228,236,.85);
+  box-shadow:0 8px 24px rgba(42,54,70,.035);
+}
+.dot{
+  background:#7ccbb2;
+  box-shadow:0 0 0 5px rgba(124,203,178,.10)
+}
+.market{
+  color:#24303d;
+  background:
+    radial-gradient(circle at 86% 0%,rgba(173,194,255,.42),transparent 32%),
+    radial-gradient(circle at 10% 90%,rgba(182,226,214,.34),transparent 30%),
+    linear-gradient(145deg,#edf2fb 0%,#eef5f3 58%,#f8fafc 100%);
+  border:1px solid rgba(215,223,234,.95);
+  box-shadow:0 14px 34px rgba(51,67,87,.06);
+}
+.market::before{
+  background:radial-gradient(circle,rgba(255,255,255,.7),transparent 65%)
+}
+.market::after{
+  border:1px solid rgba(129,151,184,.08);
+  box-shadow:0 0 0 26px rgba(129,151,184,.025),0 0 0 52px rgba(129,151,184,.016)
+}
+.market .eyebrow,.marketMeta span{color:#7b8794}
+.market .up{color:#df6470}.market .down{color:#3d987c}
+.marketMeta div{
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(216,223,233,.7)
+}
+.marketMeta b{color:#283442}
+.sectionHead h3{
+  font-weight:800;
+  letter-spacing:-.25px;
+}
+.tool,.tab{
+  background:rgba(255,255,255,.86);
+  border-color:#e6ebf0;
+  box-shadow:none;
+}
+.tab.active{
+  background:#273241;
+  color:white;
+  border-color:#273241;
+  box-shadow:0 8px 20px rgba(39,50,65,.12)
+}
+.card{
+  background:rgba(255,255,255,.90);
+  border:1px solid rgba(229,234,240,.95);
+  box-shadow:0 12px 30px rgba(42,54,70,.05);
+  border-radius:24px;
+}
+.card::after{
+  background:linear-gradient(90deg,transparent,rgba(144,164,196,.12),transparent)
+}
+.star.on{
+  color:#e2b255;
+  filter:drop-shadow(0 3px 7px rgba(226,178,85,.18))
+}
+.tag{
+  background:#f3f6f8;
+  border:1px solid #edf0f3;
+  color:#5f6b78;
+  font-weight:700
+}
+.tag.trendUp{background:#fff1f2;color:#db626a;border-color:#f9e3e5}
+.tag.trendDown{background:#edf8f4;color:#3e9278;border-color:#dff1ea}
+.tag.neutral{background:#fff8eb;color:#ad7f3d;border-color:#f6ecd7}
+.quick div{
+  background:#f8fafb;
+  border:1px solid #eff2f5;
+}
+.quick div::before{
+  width:3px;
+  background:linear-gradient(180deg,#a8baf4,#9fd9c8);
+  opacity:.65
+}
+.detailBtn{
+  color:#6179b5;
+  font-weight:750
+}
+.panel{
+  background:rgba(255,255,255,.91);
+  border:1px solid rgba(229,234,240,.95);
+  box-shadow:0 12px 30px rgba(42,54,70,.048);
+  border-radius:24px
+}
+.chart{
+  background:
+    linear-gradient(180deg,rgba(250,252,255,.95),rgba(247,249,251,.95));
+  border:1px solid #eef1f4;
+}
+.analysis{
+  color:#24303d;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(184,201,255,.30),transparent 30%),
+    radial-gradient(circle at 10% 100%,rgba(191,230,219,.26),transparent 30%),
+    linear-gradient(145deg,#f0f4fb,#f3f7f5 70%,#fafbfd);
+  border:1px solid #e1e7ee
+}
+.analysis::after{
+  color:rgba(83,104,137,.035)
+}
+.analysis p{color:#4f5c69}
+.analysis .panelTitle small{color:#7f8b98}
+.level{
+  background:#f8fafb;
+  border:1px solid #eef1f4
+}
+nav{
+  background:rgba(36,45,58,.92);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 14px 30px rgba(33,43,55,.14)
+}
+nav button{color:#98a4b2}
+nav button.active{color:#fff}
+nav button.active::before{
+  background:linear-gradient(90deg,#b3c2ff,#a8dbc9)
+}
+@keyframes floatIn{
+  0%{opacity:0;transform:translateY(12px) scale(.99)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.market,.status,.card,.panel{
+  animation:floatIn .42s cubic-bezier(.2,.7,.2,1) both
+}
+.card:hover{
+  border-color:#dfe5ec;
+  box-shadow:0 16px 38px rgba(42,54,70,.065)
+}
 </style>
 </head>
 <body>
