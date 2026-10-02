@@ -266,6 +266,23 @@ nav button.active::before{
 .stockSearchInput{width:100%;border:1px solid #dfe5ec;background:white;border-radius:16px;padding:14px 15px;font-size:15px;outline:none}.stockSearchInput:focus{border-color:#b8c8ef;box-shadow:0 0 0 4px rgba(157,183,255,.12)}
 .stockSearchHint{font-size:10px;color:var(--muted);margin:8px 3px 10px}.stockResults{display:grid;gap:8px;overflow:auto;max-height:52vh;padding-bottom:4px}.stockResult{border:1px solid #e8edf2;background:white;border-radius:16px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}.stockResult strong{font-size:14px}.stockResult small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.stockMarket{font-size:9px;border-radius:999px;padding:5px 8px;background:#f1f4f7;color:#64707e;font-weight:700;white-space:nowrap}
 @media(min-width:700px){.stockSearchOverlay{align-items:center}}
+
+/* ===== dense watchlist + theme controls ===== */
+.headerActions{display:flex;gap:6px;align-items:center}.headerBtn{height:34px;border:1px solid var(--line);background:rgba(255,255,255,.78);color:var(--text);border-radius:11px;padding:0 10px;font-size:10px;font-weight:800}.addBtn{width:36px;padding:0;font-size:18px;background:var(--dark);color:white;border-color:var(--dark)}
+.market{padding:13px 14px;margin-bottom:11px;border-radius:20px}.marketMeta{margin-top:9px;gap:6px}.marketMeta div{padding:7px 8px}.marketPrice b{font-size:20px}.status{padding:8px 11px;margin-bottom:9px}.sectionHead{padding-bottom:7px}.tabsWrap{padding-bottom:7px}.hint{padding-bottom:7px}
+.list{gap:7px}.stockCard{padding:10px 11px;border-radius:17px}.stockTop{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center}.stockTitle{min-width:0}.stockTitle .name{font-size:15px}.stockTitle .ticker{font-size:10px}.stockPrice{text-align:right}.stockPrice b{font-size:16px}.stockPrice .change{font-size:10px;margin-top:1px}
+.cardActions{display:flex;gap:2px}.miniIcon{width:30px;height:30px;border:0;background:transparent;border-radius:9px;color:#a5afba;font-size:17px;line-height:1}.miniIcon:hover{background:#f1f4f7}.miniIcon.danger{font-size:14px}.miniIcon.danger:hover{background:#fff0f1;color:#d95b64}
+.stockMetaRow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 7px}.stockMetaRow .tag{padding:3px 6px;font-size:8px}.stockFacts{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:9px}.stockFacts b{color:var(--text);font-size:10px;margin-left:3px}.stockBottom{display:flex;justify-content:space-between;align-items:center;gap:8px}.detailBtn{margin-top:0;font-size:9px}
+.card::after{display:none}.quick{display:none}
+body[data-theme="dark"]{--bg:#11161d;--card:#181f28;--text:#edf2f7;--muted:#8f9cab;--line:#2a3440;--dark:#edf2f7;--shadow:0 12px 28px rgba(0,0,0,.18);background:radial-gradient(circle at 15% 0%,rgba(73,95,145,.18),transparent 28%),radial-gradient(circle at 95% 8%,rgba(61,120,103,.14),transparent 26%),linear-gradient(180deg,#11161d,#141a22)}
+body[data-theme="dark"] header{background:rgba(17,22,29,.88);border-bottom-color:#28313b}body[data-theme="dark"] .brand,body[data-theme="dark"] .market,body[data-theme="dark"] .marketMeta b{color:var(--text)}
+body[data-theme="dark"] .status,body[data-theme="dark"] .card,body[data-theme="dark"] .panel,body[data-theme="dark"] .tool,body[data-theme="dark"] .tab,body[data-theme="dark"] .headerBtn,body[data-theme="dark"] .stockSearchPanel,body[data-theme="dark"] .stockResult,body[data-theme="dark"] .stockSearchInput,body[data-theme="dark"] .empty{background:rgba(24,31,40,.94);border-color:#2b3541;color:var(--text)}
+body[data-theme="dark"] .market{background:radial-gradient(circle at 86% 0%,rgba(91,110,166,.24),transparent 32%),radial-gradient(circle at 10% 90%,rgba(76,135,117,.18),transparent 30%),linear-gradient(145deg,#19222d,#1d2834)}
+body[data-theme="dark"] .marketMeta div,body[data-theme="dark"] .level,body[data-theme="dark"] .metric,body[data-theme="dark"] .tech div,body[data-theme="dark"] .chart{background:#141b23;border-color:#28323e}
+body[data-theme="dark"] .tag{background:#202934;border-color:#2c3744;color:#b8c2ce}body[data-theme="dark"] .miniIcon:hover{background:#222c37}body[data-theme="dark"] .analysis{background:linear-gradient(145deg,#1b2530,#17212a);border-color:#2b3541}body[data-theme="dark"] .analysis p{color:#cdd5de}
+body[data-theme="dark"] .stockSearchOverlay{background:rgba(4,8,12,.58)}body[data-theme="dark"] .stockSearchClose,body[data-theme="dark"] .stockMarket{background:#222c37;color:#c7d0da}
+body[data-theme="dark"] nav{background:rgba(9,13,18,.94)}
+@media(max-width:390px){.headerBtn{padding:0 8px}.stockFacts{gap:8px}.marketMeta{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -273,34 +290,34 @@ nav button.active::before{
 <div id="loginGate" style="position:fixed;inset:0;z-index:100;background:linear-gradient(180deg,#f9fbfe,#f3f6f9);display:flex;align-items:center;justify-content:center;padding:24px">
   <div style="width:min(100%,420px);background:rgba(255,255,255,.94);border:1px solid #e6ebf1;border-radius:28px;padding:28px;box-shadow:0 24px 60px rgba(28,40,58,.10);text-align:center">
     <div style="font-size:28px;font-weight:850;letter-spacing:-1px">Stock Lens</div>
-    <div style="font-size:12px;color:#788391;margin-top:6px;line-height:1.6">登入後載入你的自選股、交易紀錄與個人設定</div>
+    <div style="font-size:12px;color:#788391;margin-top:6px;line-height:1.6">把想看的股票收進口袋，市場一有風吹草動就比較好找。</div>
     <div id="googleButton" style="display:flex;justify-content:center;margin-top:24px"></div>
-    <div id="loginMessage" style="font-size:10px;color:#8a95a3;margin-top:14px">使用 Google 帳號登入</div>
+    <div id="loginMessage" style="font-size:10px;color:#8a95a3;margin-top:14px">用 Google 開始逛市場</div>
   </div>
 </div>
 <div id="stockSearchOverlay" class="stockSearchOverlay" onclick="if(event.target===this)closeStockSearch()">
   <div class="stockSearchPanel">
-    <div class="stockSearchHead"><h3>加入自選股票</h3><button class="stockSearchClose" onclick="closeStockSearch()">×</button></div>
+    <div class="stockSearchHead"><h3>把一檔股票收進來</h3><button class="stockSearchClose" onclick="closeStockSearch()">×</button></div>
     <input id="stockSearchInput" class="stockSearchInput" placeholder="輸入股票代號或名稱，例如 2383、台光電" autocomplete="off" oninput="renderStockSearch()">
-    <div class="stockSearchHint">支援上市、上櫃股票 · 可用代號、公司簡稱或完整公司名稱搜尋</div>
+    <div class="stockSearchHint">打代號也行、打名字也行，找到對的那檔就收下。</div>
     <div id="stockResults" class="stockResults"></div>
   </div>
 </div>
 <div class="home" id="home">
-<header><div class="brandrow"><div class="brand">Stock Lens<small id="userLine">台股研究工作台</small></div><div style="display:flex;gap:8px"><button class="icon" onclick="logout()" style="font-size:13px">↗</button><button class="icon" onclick="addStock()">＋</button></div></div></header>
-<div class="status"><div><span class="dot"></span><b id="statusText">真實資料更新中</b></div><small id="updatedAt">--</small></div>
-<div class="market"><div class="row"><div><div class="eyebrow">今日大盤</div><h2>加權指數 TAIEX</h2></div><div class="marketPrice"><b id="taiexPrice">--</b><div id="taiexChange" class="change">--</div></div></div><div class="marketMeta"><div><span>狀態</span><b>盤中</b></div><div><span>更新時間</span><b id="marketTime">--</b></div><div><span>來源</span><b>TWSE</b></div></div></div>
-<div class="sectionHead row"><h3>我的自選</h3><div class="tools"><button class="tool" onclick="renameGroup()">重新命名</button><select class="tool" id="sortSelect" onchange="renderCards()"><option value="custom">自訂</option><option value="change">漲跌幅</option><option value="name">名稱</option></select></div></div>
-<div class="tabsWrap"><div class="tabs" id="tabs"></div></div><div class="hint">★ 星號股票永遠置頂 · 點股票看完整分析</div>
+<header><div class="brandrow"><div class="brand">Stock Lens<small id="userLine">今天想盯哪幾檔？</small></div><div class="headerActions"><button class="headerBtn" id="themeBtn" onclick="toggleTheme()" title="切換深淺色">◐ 夜色</button><button class="headerBtn" onclick="logout()" title="登出">⇥ 先離場</button><button class="headerBtn addBtn" onclick="addStock()" title="加入股票">＋</button></div></div></header>
+<div class="status"><div><span class="dot"></span><b id="statusText">市場雷達連線中</b></div><small id="updatedAt">--</small></div>
+<div class="market"><div class="row"><div><div class="eyebrow">市場體感</div><h2>今天的大盤溫度</h2></div><div class="marketPrice"><b id="taiexPrice">--</b><div id="taiexChange" class="change">--</div></div></div><div class="marketMeta"><div><span>狀態</span><b>盤中</b></div><div><span>更新時間</span><b id="marketTime">--</b></div><div><span>來源</span><b>TWSE</b></div></div></div>
+<div class="sectionHead row"><h3>我的雷達</h3><div class="tools"><button class="tool" onclick="renameGroup()">換個名字</button><select class="tool" id="sortSelect" onchange="renderCards()"><option value="custom">照我的順序</option><option value="change">誰最會動</option><option value="name">照名字排</option></select></div></div>
+<div class="tabsWrap"><div class="tabs" id="tabs"></div></div><div class="hint">★ 喜歡就釘上去 · 🗑 不想看就丟掉 · 點進去看細節</div>
 <div class="list" id="watchlist"><div class="empty">載入自選股行情…</div></div>
 </div>
 
 <div class="detail" id="detail">
-<div class="detailHeader"><button class="back" onclick="closeDetail()">← 返回自選</button><div class="row detailTitle"><div><h1 id="dName">--</h1><p id="dIndustry">--</p></div><div class="price"><b id="dPrice">--</b><div id="dChange" class="change">--</div></div></div></div>
+<div class="detailHeader"><button class="back" onclick="closeDetail()">← 回雷達</button><div class="row detailTitle"><div><h1 id="dName">--</h1><p id="dIndustry">--</p></div><div class="price"><b id="dPrice">--</b><div id="dChange" class="change">--</div></div></div></div>
 <div class="panel"><div class="panelTitle"><h3>今日行情</h3><small id="dTime">--</small></div><div class="grid6"><div class="metric"><span>開盤</span><b id="dOpen">--</b></div><div class="metric"><span>最高</span><b id="dHigh">--</b></div><div class="metric"><span>最低</span><b id="dLow">--</b></div><div class="metric"><span>昨收</span><b id="dPrev">--</b></div><div class="metric"><span>成交量</span><b id="dVol">--</b></div><div class="metric"><span>振幅</span><b id="dAmp">--</b></div></div></div>
 <div class="panel"><div class="panelTitle"><h3>近期價格走勢</h3><small id="historyLabel">載入中</small></div><div class="chart" id="chart"></div></div>
 <div class="panel"><div class="panelTitle"><h3>技術面</h3><small>真實歷史日線計算</small></div><div class="tech"><div><span>MA5</span><b id="ma5">--</b></div><div><span>MA10</span><b id="ma10">--</b></div><div><span>MA20</span><b id="ma20">--</b></div></div><div class="levels"><div class="level"><span>支撐觀察區</span><b class="up" id="support">--</b><small>近 10 日低點區域，需搭配止跌確認。</small></div><div class="level"><span>壓力觀察區</span><b class="down" id="resistance">--</b><small>近 10 日高點區域，突破需觀察量能。</small></div></div></div>
-<div class="panel analysis"><div class="panelTitle"><h3>✦ 規則分析</h3><small>量價＋均線</small></div><p id="analysisText">載入中…</p></div>
+<div class="panel analysis"><div class="panelTitle"><h3>✦ 規則分析</h3><small>量價＋均線</small></div><p id="analysisText">正在翻資料…</p></div>
 <div class="panel"><div class="panelTitle"><h3>法人 / 大戶</h3><small>下一階段</small></div><div class="placeholder">這區暫時不放假資料。下一步會接入三大法人買賣超與集保大戶週資料，再加入 AI 綜合分析。</div></div>
 </div>
 </div>
@@ -346,7 +363,7 @@ async function handleGoogleCredential(response){
 async function showSignedIn(){
   if(!signedInUser)return;
   $('loginGate').style.display='none';
-  $('userLine').textContent=(signedInUser.display_name||signedInUser.email)+' · 台股研究工作台';
+  $('userLine').textContent=(signedInUser.display_name||signedInUser.email)+' · 今天來看市場演哪齣';
   await loadStockMaster();
   await loadUserWatchlist();
 }
@@ -356,8 +373,16 @@ function logout(){
   signedInUser=null;
   if(window.google?.accounts?.id) google.accounts.id.disableAutoSelect();
   $('loginGate').style.display='flex';
-  $('loginMessage').textContent='使用 Google 帳號登入';
+  $('loginMessage').textContent='用 Google 開始逛市場';
 }
+function applyTheme(theme){
+  document.body.dataset.theme=theme;
+  localStorage.setItem('stockLensTheme',theme);
+  if($('themeBtn')) $('themeBtn').textContent=theme==='dark'?'◐ 日光':'◐ 夜色';
+}
+function toggleTheme(){applyTheme(document.body.dataset.theme==='dark'?'light':'dark')}
+applyTheme(localStorage.getItem('stockLensTheme')||((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'));
+
 window.addEventListener('load',()=>{
   try{
     const cached=sessionStorage.getItem('stockLensUser');
@@ -391,11 +416,10 @@ const presets={
  '2412':{industry:'電信 · 高股息'}
 };
 let groups=[
- {group_id:'g_ai',name:'AI 供應鏈',symbols:['2383','3037','8046']},
- {group_id:'g_dividend',name:'高股息',symbols:['2412']},
- {group_id:'g_watch',name:'觀察中',symbols:[]}
+ {group_id:'g_starter',name:'新手先看',symbols:['2330','2412','2882']},
+ {group_id:'g_watch',name:'我的雷達',symbols:[]}
 ];
-let stars=new Set(['2383']);
+let stars=new Set();
 let active=0,quotes={},currentSymbol=null,hist=[],watchlistReady=false;
 
 function currentCredential(){return sessionStorage.getItem('stockLensCredential')||''}
@@ -414,7 +438,7 @@ async function userApi(action, extra={}){
     sessionStorage.removeItem('stockLensCredential');
     signedInUser=null;
     $('loginGate').style.display='flex';
-    $('loginMessage').textContent='登入已逾時，請重新使用 Google 登入';
+    $('loginMessage').textContent='這張市場通行證過期了，再登入一次就好';
     throw new Error('session_expired');
   }
   if(!r.ok||!data.ok) throw new Error(data.error||'api_failed');
@@ -448,10 +472,10 @@ async function loadUserWatchlist(){
     watchlistReady=true;
     renderTabs();
     await loadQuotes();
-    $('statusText').textContent='個人資料已同步';
+    $('statusText').textContent='你的雷達收好了';
   }catch(e){
     watchlistReady=false;
-    if(e.message!=='session_expired') $('statusText').textContent='個人資料同步失敗 · '+e.message;
+    if(e.message!=='session_expired') $('statusText').textContent='你的雷達暫時迷路 · '+e.message;
     renderTabs();
     await loadQuotes();
   }
@@ -468,13 +492,13 @@ async function save(){
       sort_order:si+1
     }))
   }));
-  $('statusText').textContent='正在同步自選…';
+  $('statusText').textContent='正在幫你收好雷達…';
   try{
     await userApi('saveWatchlist',{groups:payload});
-    $('statusText').textContent='個人資料已同步';
+    $('statusText').textContent='你的雷達收好了';
     $('updatedAt').textContent='同步 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
   }catch(e){
-    if(e.message!=='session_expired') $('statusText').textContent='自選同步失敗 · '+e.message;
+    if(e.message!=='session_expired') $('statusText').textContent='雷達沒收好 · '+e.message;
   }
 }
 function parseQ(q){const current=num(q.z)||num((q.a||'').split('_')[0])||num(q.y),prev=num(q.y),change=current-prev;return{symbol:q.c,name:q.n||q.c,current,prev,change,pct:prev?change/prev*100:NaN,open:num(q.o),high:num(q.h),low:num(q.l),vol:num(q.v),bid:num((q.b||'').split('_')[0]),ask:num((q.a||'').split('_')[0]),time:q.t||''}}
@@ -486,26 +510,68 @@ function renderCards(){
  arr.sort((a,b)=>{if(stars.has(a.symbol)!==stars.has(b.symbol))return stars.has(a.symbol)?-1:1;if(mode==='change')return b.pct-a.pct;if(mode==='name')return a.name.localeCompare(b.name,'zh-Hant');return g.symbols.indexOf(a.symbol)-g.symbols.indexOf(b.symbol)});
  $('watchlist').innerHTML=arr.length?arr.map(q=>{
    const trend=q.current>q.prev?'trendUp':q.current<q.prev?'trendDown':'neutral';
-   const trendTxt=q.current>q.prev?'今日偏強':q.current<q.prev?'今日偏弱':'平盤';
-   return '<div class="card"><div class="row"><div style="display:flex;gap:9px;align-items:flex-start"><button class="star '+(stars.has(q.symbol)?'on':'')+'" onclick="event.stopPropagation();toggleStar(\''+q.symbol+'\')">'+(stars.has(q.symbol)?'★':'☆')+'</button><div><span class="name">'+q.name+'</span><span class="ticker">'+q.symbol+'</span></div></div><div class="price"><b>'+fmt(q.current,q.current<1000?1:0)+'</b><div class="change '+(q.change>=0?'up':'down')+'">'+(q.change>=0?'+':'')+fmt(q.change,q.current<1000?1:0)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)</div></div></div><div class="tags"><span class="tag">'+(stockMeta[q.symbol]?.industry||presets[q.symbol]?.industry||'待分類')+'</span><span class="tag '+trend+'">'+trendTxt+'</span></div><div class="quick"><div><span>成交量</span><b>'+fmt(q.vol)+' 張</b></div><div><span>今日高</span><b>'+fmt(q.high,q.high<1000?1:0)+'</b></div><div><span>今日低</span><b>'+fmt(q.low,q.low<1000?1:0)+'</b></div></div><button class="detailBtn" onclick="openDetail(\''+q.symbol+'\')">查看完整分析 →</button></div>'
- }).join(''):'<div class="empty">這個分頁還沒有股票，按右上角 ＋ 加入。</div>';
+   const trendTxt=q.current>q.prev?'今天有精神':q.current<q.prev?'今天先蹲一下':'原地觀察';
+   const industry=stockMeta[q.symbol]?.industry||presets[q.symbol]?.industry||'還在認識它';
+   return '<div class="card stockCard"><div class="stockTop"><button class="miniIcon star '+(stars.has(q.symbol)?'on':'')+'" onclick="event.stopPropagation();toggleStar(\''+q.symbol+'\')" title="釘選">'+(stars.has(q.symbol)?'★':'☆')+'</button><div class="stockTitle" onclick="openDetail(\''+q.symbol+'\')"><span class="name">'+q.name+'</span><span class="ticker">'+q.symbol+'</span></div><div class="stockPrice" onclick="openDetail(\''+q.symbol+'\')"><b>'+fmt(q.current,q.current<1000?1:0)+'</b><div class="change '+(q.change>=0?'up':'down')+'">'+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%</div></div><div class="cardActions"><button class="miniIcon danger" onclick="event.stopPropagation();removeStock(\''+q.symbol+'\')" title="移出自選">⌫</button></div></div><div class="stockBottom"><div class="stockMetaRow"><span class="tag">'+industry+'</span><span class="tag '+trend+'">'+trendTxt+'</span></div><button class="detailBtn" onclick="openDetail(\''+q.symbol+'\')">偷看細節 →</button></div><div class="stockFacts"><span>量<b>'+fmt(q.vol)+'</b></span><span>高<b>'+fmt(q.high,q.high<1000?1:0)+'</b></span><span>低<b>'+fmt(q.low,q.low<1000?1:0)+'</b></span></div></div>'
+ }).join(''):'<div class="empty">這裡還空空的。按右上角 ＋，抓幾檔股票進來陪你。</div>';
+}
+async function removeStock(symbol){
+  const q=quotes[symbol];
+  const label=q?.name||stockMeta[symbol]?.name||symbol;
+  if(!confirm('把 '+label+' 移出這個雷達？'))return;
+  groups[active].symbols=groups[active].symbols.filter(s=>String(s)!==String(symbol));
+  stars.delete(String(symbol));
+  renderCards();
+  await save();
 }
 async function loadQuotes(){
- renderTabs();$('watchlist').innerHTML='<div class="empty">更新真實行情中…</div>';
+ renderTabs();$('watchlist').innerHTML='<div class="empty">市場訊號抓取中…</div>';
  const syms=groups[active].symbols;
  if(!syms.length){renderCards();return}
  try{
    const markets=syms.map(s=>stockMeta[s]?.market||'TWSE');
    const j=await api('type=quotes&symbols='+syms.join(',')+'&markets='+markets.join(','));
    (j.msgArray||[]).forEach(x=>{const q=parseQ(x);if(q.symbol)quotes[q.symbol]=q});
-   $('statusText').textContent='真實資料已更新';
+   $('statusText').textContent='市場資料到齊了';
    $('updatedAt').textContent='更新 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
    renderCards()
- }catch(e){$('watchlist').innerHTML='<div class="empty">行情暫時無法取得，請稍後重新整理。</div>'}
+ }catch(e){$('watchlist').innerHTML='<div class="empty">市場剛剛閃了一下，等等再刷一次。</div>'}
 }
 async function loadMarket(){try{const j=await api('type=index'),q=parseQ(j.msgArray[0]);$('taiexPrice').textContent=fmt(q.current,2);$('taiexChange').className='change '+(q.change>=0?'up':'down');$('taiexChange').textContent=(q.change>=0?'+':'')+fmt(q.change,2)+' ('+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%)';$('marketTime').textContent=q.time||'--'}catch(e){}}
-async function addStock(){const s=(prompt('輸入上市股票代號，例如 2383')||'').trim();if(!/^\d{4}$/.test(s))return;if(groups[active].symbols.includes(s))return alert('這檔已在目前分頁');try{const j=await api('type=quote&symbol='+s);if(!j.msgArray||!j.msgArray.length)return alert('找不到股票');const q=parseQ(j.msgArray[0]);quotes[s]=q;groups[active].symbols.push(s);renderCards();await save()}catch(e){alert('目前無法驗證這個股票代號')}}
-async function renameGroup(){const n=(prompt('重新命名目前分頁',groups[active].name)||'').trim();if(n){groups[active].name=n.slice(0,12);renderTabs();await save()}}
+async function addStock(){
+  await loadStockMaster();
+  $('stockSearchOverlay').classList.add('show');
+  $('stockSearchInput').value='';
+  renderStockSearch();
+  setTimeout(()=>$('stockSearchInput').focus(),80);
+}
+function closeStockSearch(){$('stockSearchOverlay').classList.remove('show')}
+function renderStockSearch(){
+  const q=($('stockSearchInput').value||'').trim().toLowerCase();
+  let matches=[];
+  if(q){
+    matches=stockMaster.map(x=>{
+      const symbol=String(x.symbol||''),name=String(x.name||''),company=String(x.company_name||'');
+      let score=99;
+      if(symbol===q)score=0;else if(symbol.startsWith(q))score=1;else if(name.toLowerCase()===q)score=2;else if(name.toLowerCase().startsWith(q))score=3;else if(company.toLowerCase().startsWith(q))score=4;else if(name.toLowerCase().includes(q))score=5;else if(company.toLowerCase().includes(q))score=6;
+      return {x,score};
+    }).filter(v=>v.score<99).sort((a,b)=>a.score-b.score||a.x.symbol.localeCompare(b.x.symbol,'zh-Hant',{numeric:true})).slice(0,12).map(v=>v.x);
+  }else{
+    matches=stockMaster.filter(x=>['2330','2412','2882'].includes(String(x.symbol)));
+  }
+  $('stockResults').innerHTML=matches.length?matches.map(x=>'<button class="stockResult" onclick="selectStock(\''+x.symbol+'\')"><div><strong>'+x.name+' <span class="ticker">'+x.symbol+'</span></strong><small>'+(x.industry||x.company_name||'')+'</small></div><span class="stockMarket">'+(x.market==='TWSE'?'上市':'上櫃')+'</span></button>').join(''):'<div class="empty">這次沒對上暗號，換個代號或名字再找一次。</div>';
+}
+async function selectStock(symbol){
+  const meta=stockMeta[symbol]; if(!meta)return;
+  if(groups[active].symbols.includes(symbol)){closeStockSearch();return alert('這檔已經在你的雷達上了')}
+  try{
+    const j=await api('type=quote&symbol='+encodeURIComponent(symbol)+'&market='+encodeURIComponent(meta.market||'TWSE'));
+    if(!j.msgArray||!j.msgArray.length)return alert('這檔現在有點害羞，暫時抓不到行情');
+    const q=parseQ(j.msgArray[0]); if(!Number.isFinite(q.current))return alert('行情正在打盹，晚點再試');
+    quotes[symbol]=q; groups[active].symbols.push(symbol); closeStockSearch(); renderCards(); await save();
+  }catch(e){alert('行情訊號斷了一下，晚點再把它收進來')}
+}
+async function renameGroup(){const n=(prompt('幫這個雷達換個名字',groups[active].name)||'').trim();if(n){groups[active].name=n.slice(0,12);renderTabs();await save()}}
 function rocDate(s){const p=String(s).split('/');return p.length===3?new Date(+p[0]+1911,+p[1]-1,+p[2]).getTime():0}
 function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN}
 function ma(n){const a=hist.slice(-n).map(x=>x.close);return a.length===n?avg(a):NaN}
